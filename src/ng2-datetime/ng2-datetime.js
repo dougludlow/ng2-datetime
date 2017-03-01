@@ -208,6 +208,10 @@ var NKDatetime = (function () {
         core_1.HostListener('dateChange', ['$event']), 
         __metadata('design:type', Object)
     ], NKDatetime.prototype, "onChange", void 0);
+    __decorate([
+        core_1.HostListener('blur'), 
+        __metadata('design:type', Object)
+    ], NKDatetime.prototype, "onTouched", void 0);
     NKDatetime = __decorate([
         core_1.Component({
             selector: 'datetime',
