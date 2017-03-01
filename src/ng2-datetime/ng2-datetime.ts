@@ -64,6 +64,7 @@ export class NKDatetime implements ControlValueAccessor, AfterViewInit, OnDestro
     @HostListener('dateChange', ['$event'])
     onChange = (_: any) => {
     }
+    @HostListener('blur')
     onTouched = () => {
     }
 
