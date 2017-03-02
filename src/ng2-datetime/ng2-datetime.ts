@@ -11,8 +11,8 @@ import { ITimepickerEvent } from './ITimepickerEvent';
         <div class="form-inline ng2-datetime">
             <div class="input-group date">
                 <input id="{{idDatePicker}}" type="text" class="form-control"
-                       [attr.readonly]="readonly"
-                       [attr.required]="required"
+                       [attr.readonly]="readonly || null"
+                       [attr.required]="required || null"
                        [attr.placeholder]="datepickerOptions.placeholder || 'Choose date'"
                        [attr.tabindex]="tabindex"
                        [(ngModel)]="dateModel"
@@ -26,8 +26,8 @@ import { ITimepickerEvent } from './ITimepickerEvent';
             </div>
             <div class="input-group bootstrap-timepicker timepicker">
                 <input id="{{idTimePicker}}" type="text" class="form-control input-small"
-                       [attr.readonly]="readonly"
-                       [attr.required]="required"
+                       [attr.readonly]="readonly || null"
+                       [attr.required]="required || null"
                        [attr.placeholder]="timepickerOptions.placeholder || 'Set time'"
                        [attr.tabindex]="tabindex"
                        [(ngModel)]="timeModel"
