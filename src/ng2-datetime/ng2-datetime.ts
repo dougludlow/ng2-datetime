@@ -1,6 +1,6 @@
 import {
     Component, Output, Input, EventEmitter, HostListener, AfterViewInit, OnDestroy,
-    SimpleChanges, OnChanges
+    SimpleChanges, OnChanges, ElementRef, Renderer
 } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { ITimepickerEvent } from './ITimepickerEvent';
@@ -14,7 +14,9 @@ import { ITimepickerEvent } from './ITimepickerEvent';
                        [attr.readonly]="readonly"
                        [attr.required]="required"
                        [attr.placeholder]="datepickerOptions.placeholder || 'Choose date'"
+                       [attr.tabindex]="tabindex"
                        [(ngModel)]="dateModel"
+                       (blur)="onTouched()"
                        (keyup)="checkEmptyValue($event)"/>
                 <div [hidden]="datepickerOptions.hideIcon || datepickerOptions === false || false"
                      (click)="showDatepicker()"
@@ -27,8 +29,10 @@ import { ITimepickerEvent } from './ITimepickerEvent';
                        [attr.readonly]="readonly"
                        [attr.required]="required"
                        [attr.placeholder]="timepickerOptions.placeholder || 'Set time'"
+                       [attr.tabindex]="tabindex"
                        [(ngModel)]="timeModel"
                        (focus)="showTimepicker()"
+                       (blur)="onTouched()"
                        (keyup)="checkEmptyValue($event)">
                 <span [hidden]="timepickerOptions.hideIcon || false" class="input-group-addon">
                     <i [ngClass]="timepickerOptions.icon || 'glyphicon glyphicon-time'"></i>
@@ -49,6 +53,7 @@ export class NKDatetime implements ControlValueAccessor, AfterViewInit, OnDestro
     @Input('hasClearButton') hasClearButton: boolean = false;
     @Input() readonly: boolean = null;
     @Input() required: boolean = null;
+    @Input() tabindex: string;
 
     date: Date; // ngModel
     dateModel: string;
@@ -68,11 +73,12 @@ export class NKDatetime implements ControlValueAccessor, AfterViewInit, OnDestro
     onTouched = () => {
     }
 
-    constructor(ngControl: NgControl) {
+    constructor(ngControl: NgControl, private element: ElementRef, private renderer: Renderer) {
         ngControl.valueAccessor = this; // override valueAccessor
     }
 
     ngAfterViewInit() {
+        this.removeTabIndex();
         this.init();
     }
 
@@ -245,6 +251,13 @@ export class NKDatetime implements ControlValueAccessor, AfterViewInit, OnDestro
 
     private pad(value: any): string {
         return value.toString().length < 2 ? '0' + value : value.toString();
+    }
+
+    private removeTabIndex() {
+        if (this.tabindex) {
+            // if a tab index is set, remove it - it has been transferred to the child inputs
+            this.renderer.setElementAttribute(this.element.nativeElement, 'tabindex', '-1');
+        }
     }
 }
 
