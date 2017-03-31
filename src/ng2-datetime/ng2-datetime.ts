@@ -165,7 +165,6 @@ export class NKDatetime implements ControlValueAccessor, AfterViewInit, OnDestro
             this.datepicker
                 .on('changeDate', (e: any) => {
                     let newDate: Date = e.date;
-                    console.log('newDate', newDate);
 
                     if (isDate(this.date) && isDate(newDate)) {
                         // get hours/minutes
@@ -223,7 +222,7 @@ export class NKDatetime implements ControlValueAccessor, AfterViewInit, OnDestro
         }
         setTimeout(() => {
             this.dateChange.emit(this.getDatepickerValue());
-        }, 150);
+        }, 300);
     }
 
     private timeUpdated(value: any) {

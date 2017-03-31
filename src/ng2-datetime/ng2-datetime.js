@@ -111,7 +111,6 @@ var NKDatetime = (function () {
             this.datepicker
                 .on('changeDate', function (e) {
                 var newDate = e.date;
-                console.log('newDate', newDate);
                 if (isDate(_this.date) && isDate(newDate)) {
                     // get hours/minutes
                     newDate.setHours(_this.date.getHours());
@@ -164,7 +163,7 @@ var NKDatetime = (function () {
         }
         setTimeout(function () {
             _this.dateChange.emit(_this.getDatepickerValue());
-        }, 150);
+        }, 300);
     };
     NKDatetime.prototype.timeUpdated = function (value) {
         if (this.isEmptyValue(value)) {
