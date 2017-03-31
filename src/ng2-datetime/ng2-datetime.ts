@@ -23,8 +23,8 @@ const CUSTOM_ACCESSOR = {
                        [attr.placeholder]="datepickerOptions.placeholder || 'Choose date'"
                        [attr.tabindex]="tabindex"
                        [(ngModel)]="dateModel"
-                       (blur)="onTouched()"
-                       (keyup)="checkEmptyValue($event)"/>
+                       (ngModelChange)="dateUpdated($event)"
+                       (blur)="onTouched()">
                 <div [hidden]="datepickerOptions.hideIcon || datepickerOptions === false || false"
                      (click)="showDatepicker()"
                      class="input-group-addon">
@@ -38,9 +38,9 @@ const CUSTOM_ACCESSOR = {
                        [attr.placeholder]="timepickerOptions.placeholder || 'Set time'"
                        [attr.tabindex]="tabindex"
                        [(ngModel)]="timeModel"
+                       (ngModelChange)="timeUpdated($event)"
                        (focus)="showTimepicker()"
-                       (blur)="onTouched()"
-                       (keyup)="checkEmptyValue($event)">
+                       (blur)="onTouched()">
                 <span [hidden]="timepickerOptions.hideIcon || false" class="input-group-addon">
                     <i [ngClass]="timepickerOptions.icon || 'glyphicon glyphicon-time'"></i>
                 </span>
@@ -142,23 +142,10 @@ export class NKDatetime implements ControlValueAccessor, AfterViewInit, OnDestro
         this.onTouched = fn;
     }
 
-    checkEmptyValue(e: any) {
-        const value = e.target.value;
-        if (value === '' && (
-                this.timepickerOptions === false ||
-                this.datepickerOptions === false ||
-                (this.timeModel === '' && this.dateModel === '')
-            )) {
-            this.dateChange.emit(null);
-        }
-    }
-
     clearModels() {
-        this.dateChange.emit(null);
-        if (this.timepicker) {
-            this.timepicker.timepicker('setTime', null);
-        }
+        this.updateTimepicker(null);
         this.updateDatepicker(null);
+        this.dateChange.emit(null);
     }
 
     showTimepicker() {
@@ -178,6 +165,7 @@ export class NKDatetime implements ControlValueAccessor, AfterViewInit, OnDestro
             this.datepicker
                 .on('changeDate', (e: any) => {
                     let newDate: Date = e.date;
+                    console.log('newDate', newDate);
 
                     if (isDate(this.date) && isDate(newDate)) {
                         // get hours/minutes
@@ -228,25 +216,59 @@ export class NKDatetime implements ControlValueAccessor, AfterViewInit, OnDestro
         this.updateModel(this.date);
     }
 
+    private dateUpdated(value: any) {
+        if (this.isEmptyValue(value)) {
+            this.dateChange.emit(null);
+            return;
+        }
+        setTimeout(() => {
+            this.dateChange.emit(this.getDatepickerValue());
+        }, 150);
+    }
+
+    private timeUpdated(value: any) {
+        if (this.isEmptyValue(value)) {
+            this.dateChange.emit(null);
+            return;
+        }
+    }
+
+    private isEmptyValue(value: any) {
+        return value === '' && (
+            this.timepickerOptions === false ||
+            this.datepickerOptions === false ||
+            (this.timeModel === '' && this.dateModel === ''))
+    }
+
     private updateModel(date: Date): void {
         this.updateDatepicker(date);
 
         // update timepicker
-        if (this.timepicker !== undefined && isDate(date)) {
-            let hours = date.getHours();
-            if (this.timepickerOptions.showMeridian) {
-                // Convert 24 to 12 hour system
-                hours = (hours === 0 || hours === 12) ? 12 : hours % 12;
-            }
-            const meridian = date.getHours() >= 12 ? ' PM' : ' AM';
-            const time =
-                this.pad(hours) + ':' +
-                this.pad(this.date.getMinutes()) + ':' +
-                this.pad(this.date.getSeconds()) +
-                (this.timepickerOptions.showMeridian || this.timepickerOptions.showMeridian === undefined
-                    ? meridian : '');
+        if (isDate(date)) {
+            this.timeModel = this.getTime(date); // fix initial empty timeModel bug
+            this.updateTimepicker(this.timeModel);
+        }
+    }
+
+    private getTime(date: Date): string {
+        let hours = date.getHours();
+        if (this.timepickerOptions.showMeridian) {
+            // Convert 24 to 12 hour system
+            hours = (hours === 0 || hours === 12) ? 12 : hours % 12;
+        }
+        const meridian = date.getHours() >= 12 ? ' PM' : ' AM';
+        const time =
+            this.pad(hours) + ':' +
+            this.pad(this.date.getMinutes()) + ':' +
+            this.pad(this.date.getSeconds()) +
+            (this.timepickerOptions.showMeridian || this.timepickerOptions.showMeridian === undefined
+                ? meridian : '');
+        return time;
+    }
+
+    private updateTimepicker(time?: any) {
+        if (this.timepicker !== undefined) {
             this.timepicker.timepicker('setTime', time);
-            this.timeModel = time; // fix initial empty timeModel bug
         }
     }
 
@@ -254,6 +276,11 @@ export class NKDatetime implements ControlValueAccessor, AfterViewInit, OnDestro
         if (this.datepicker !== undefined) {
             this.datepicker.datepicker('update', date);
         }
+    }
+
+    private getDatepickerValue(): Date {
+        if (!this.datepicker) { return null; }
+        return this.datepicker.datepicker('getDate');
     }
 
     private pad(value: any): string {
