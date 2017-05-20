@@ -102,6 +102,22 @@ var NKDatetime = (function () {
     NKDatetime.prototype.showDatepicker = function () {
         this.datepicker.datepicker('show');
     };
+    NKDatetime.prototype.dateUpdated = function (value) {
+        var _this = this;
+        if (this.isEmptyValue(value)) {
+            this.dateChange.emit(null);
+            return;
+        }
+        setTimeout(function () {
+            _this.dateChange.emit(_this.getDatepickerValue());
+        }, 150);
+    };
+    NKDatetime.prototype.timeUpdated = function (value) {
+        if (this.isEmptyValue(value)) {
+            this.dateChange.emit(null);
+            return;
+        }
+    };
     //////////////////////////////////
     NKDatetime.prototype.init = function () {
         var _this = this;
@@ -154,22 +170,6 @@ var NKDatetime = (function () {
             $('#' + this.idTimePicker).parent().remove();
         }
         this.updateModel(this.date);
-    };
-    NKDatetime.prototype.dateUpdated = function (value) {
-        var _this = this;
-        if (this.isEmptyValue(value)) {
-            this.dateChange.emit(null);
-            return;
-        }
-        setTimeout(function () {
-            _this.dateChange.emit(_this.getDatepickerValue());
-        }, 300);
-    };
-    NKDatetime.prototype.timeUpdated = function (value) {
-        if (this.isEmptyValue(value)) {
-            this.dateChange.emit(null);
-            return;
-        }
     };
     NKDatetime.prototype.isEmptyValue = function (value) {
         return value === '' && (this.timepickerOptions === false ||
