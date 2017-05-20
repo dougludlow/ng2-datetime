@@ -156,6 +156,23 @@ export class NKDatetime implements ControlValueAccessor, AfterViewInit, OnDestro
         this.datepicker.datepicker('show');
     }
 
+    dateUpdated(value: any) {
+        if (this.isEmptyValue(value)) {
+            this.dateChange.emit(null);
+            return;
+        }
+        setTimeout(() => {
+            this.dateChange.emit(this.getDatepickerValue());
+        }, 150);
+    }
+
+    timeUpdated(value: any) {
+        if (this.isEmptyValue(value)) {
+            this.dateChange.emit(null);
+            return;
+        }
+    }
+
     //////////////////////////////////
 
     private init(): void {
@@ -213,23 +230,6 @@ export class NKDatetime implements ControlValueAccessor, AfterViewInit, OnDestro
         }
 
         this.updateModel(this.date);
-    }
-
-    private dateUpdated(value: any) {
-        if (this.isEmptyValue(value)) {
-            this.dateChange.emit(null);
-            return;
-        }
-        setTimeout(() => {
-            this.dateChange.emit(this.getDatepickerValue());
-        }, 300);
-    }
-
-    private timeUpdated(value: any) {
-        if (this.isEmptyValue(value)) {
-            this.dateChange.emit(null);
-            return;
-        }
     }
 
     private isEmptyValue(value: any) {
